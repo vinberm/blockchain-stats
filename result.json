@@ -1,0 +1,15 @@
+{
+    "average_block_interval": 55, 
+    "block_fee": 830114, 
+    "block_num_one_day": 1568, 
+    "difficulty": "160077945", 
+    "hash_rate": 5313144, 
+    "height": 10395, 
+    "last_block_interval": 5, 
+    "max_block_interval": 376, 
+    "median_block_interval": 40, 
+    "min_block_interval": 3, 
+    "pool_tx_num": 0, 
+    "tx_fee": 0, 
+    "tx_num": 1
+}
