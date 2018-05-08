@@ -14,8 +14,8 @@ def run(url):
     h = asl.get_recent_height()
     block_status = asl.new_block_status()
 
-    filename = os.getcwd() + '/result.json'
-    print filename
+    filename = os.path.join(os.getcwd(), 'result.json')
+    print 'filename', filename
     if not os.path.exists('result.json'):
         os.system(r'touch {}'.format(filename))
 
@@ -38,7 +38,7 @@ def run(url):
     with open(filename, 'w') as f:
         json.dump(result, f, indent=4, sort_keys=True)
     with open(filename, 'r') as f:
-        print json.load(f)
+        json.load(f)
 
     print "*************let's go!!!***************"
     print

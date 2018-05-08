@@ -4,7 +4,7 @@ import json
 import requests
 import time
 
-DEFUALT_ASSET_ID = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
+DEFAULT_ASSET_ID = 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'
 
 
 class BasicInfo:
@@ -113,10 +113,10 @@ class BasicInfo:
         total_in = 0
         total_out = 0
         for txin in tx['inputs']:
-            btm_in = txin['amount'] if txin['asset_id'] == DEFUALT_ASSET_ID else 0
+            btm_in = txin['amount'] if txin['asset_id'] == DEFAULT_ASSET_ID else 0
             total_in += btm_in
         for txout in tx['outputs']:
-            btm_out = txin['amount'] if txout['asset_id'] == DEFUALT_ASSET_ID else 0
+            btm_out = txin['amount'] if txout['asset_id'] == DEFAULT_ASSET_ID else 0
             total_out += btm_out
         return total_in - total_out
 
