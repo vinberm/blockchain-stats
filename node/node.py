@@ -14,21 +14,28 @@ print address
 
 hosts = []
 for item in address:
-    addr = item['Addr']['IP']
-    print addr
-    hosts.append(addr)
+    ip = item['Addr']['IP']
+    post = item['Addr']['Port']
+    print ip, post
+    hosts.append((ip, post))
+
 
 num = 0
-
-# '149.28.23.212:46657'
+valid = []
 for ip in hosts:
-    s = socket.socket()
-    r = s.connect((ip, 46657))
-    if r == socket.error:
-        continue
-    else:
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(0.1)
+    r = s.connect_ex(ip)
+    if r == 0:
         num += 1
-        print 'r', r
+        valid.append(ip)
+        print 'online node: ', ip
+        print 'return value of r: ', r
+    else:
+        print "error-r:", r
+        # continue
     s.close()
 
-print 'num', num
+print 'number of online node: ', num
+print 'valid node: ', valid
+print '******************END!!!**********************'
