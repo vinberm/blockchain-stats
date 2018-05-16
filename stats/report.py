@@ -133,7 +133,7 @@ class BasicInfo:
         recent_height = self.get_recent_height()
         recent_timestamp = self.get_block_by_height(recent_height)['timestamp']
         if recent_timestamp + 86400 < ticks:
-            return 0, []
+            return []
         ti = ticks
         height = recent_height
         timestamps = []
@@ -156,3 +156,25 @@ class BasicInfo:
         median_interval = (intervals[length/2] + intervals[length/2-1]) / 2 if length % 2 == 0 else intervals[(length+1)/2]
         # 24小时内出块总数、平均时间、中位数、最大、最小
         return [total_num, average_block_time, median_interval, intervals[-1], intervals[0]]
+
+    def all_chain_status(self):
+        h = self.get_recent_height()
+        block_status = self.new_block_status()
+        if len(block_status) == 0:
+            return None
+        result = {
+            "height": h,
+            "last_block_interval": self.get_last_block_interval(h),
+            "difficulty": self.get_difficulty(h),
+            "hash_rate": self.get_average_hash_rate(h, 100),
+            "tx_num": self.get_tx_num(h, 100),
+            "block_fee": self.get_block_fee(h, 100),
+            "tx_fee": self.get_average_txs_fee(h),
+            "pool_tx_num": self.list_txpool_num(),
+            "block_num_one_day": block_status[0],
+            "average_block_interval": block_status[1],
+            "median_block_interval": block_status[2],
+            "max_block_interval": block_status[3],
+            "min_block_interval": block_status[4]
+        }
+        return result

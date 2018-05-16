@@ -21,13 +21,19 @@ def listcoins():
     return res.json()['data']
 
 
-if __name__ == '__main__':
-    c = listcoins()
-    pa = []
-    for x in c:
-        if x['symbol'] == 'EOS' or x['symbol'] == 'ETH':
-            pa.append(x)
-    print pa
+def btm_coin():
+    for y in listcoins():
+        if y['symbol'] == 'BTM':
+            return y
+    return None
 
-    for coin in pa:
-        print coinmaketcap(coin['id'])
+
+def btm_info():
+    info = btm_coin()
+    if info is None:
+        return None
+    return coinmaketcap(info['id'])
+
+
+if __name__ == '__main__':
+    print btm_info()
