@@ -1,9 +1,18 @@
 # -*- coding: utf-8 -*-
 
+# import fcntl
+import logging
 import json
+import gevent
+import threading
 import os
 import socket
 from parser import ip_info
+from gevent import Greenlet
+from gevent import monkey; monkey.patch_all()
+
+mutex = threading.Lock()
+LOG = logging.getLogger('node')
 
 
 def record_to_file(data, filename):
@@ -12,6 +21,66 @@ def record_to_file(data, filename):
         os.system(r'touch {}'.format(filename))
     with open(filepath, 'w') as f:
         json.dump(data, f, indent=4, sort_keys=True)
+
+
+# path: addrbook.json
+def read_addr_book(path):
+    mutex.acquire(2)
+    with open(path, 'r') as f:
+        data = json.load(f)
+    mutex.release()
+    if data is None:
+        return None
+    return data['Addrs']
+
+
+# (ip, port)
+def parse_address(path):
+    addrs = read_addr_book(path)
+    hosts = []
+    for item in addrs:
+        ip = item['Addr'].get('IP')
+        port = item['Addr'].get('Port')
+        if ip is None and port is None:
+            return None
+        hosts.append((ip, port))
+    return hosts
+
+
+class NodeConn(Greenlet):
+
+    def __init__(self, addr, port, timeout=1):
+
+        super(NodeConn, self).__init__()
+
+        self.daddr = addr
+        self.dport = port
+        self.timeout = timeout
+        self.sock = gevent.socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+        self.state = "Connecting"
+
+        LOG.debug("Connecting to Node IP #%s:%d" % (self.daddr, self.dport))
+
+        try:
+            self.sock.settimeout(self.timeout)
+            self.sock.connect((addr, port))
+        except:
+            self.handle_close()
+
+        self.state = "Connected"
+
+    def handle_close(self):
+
+        LOG.debug("%s closed" % self.daddr)
+        try:
+            self.sock.close()
+        except BaseException:
+            pass
+        self.state = "Closed"
+
+
+
 
 
 filename = '/Users/Nov/Library/bytom/addrbook.json'

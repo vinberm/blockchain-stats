@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import hashlib
+import platform
+import os
 from numpy import uint32, uint8
 
 
@@ -18,6 +20,20 @@ def sort32(a, b):
     else:
         lo, hi = b, a
     return lo, hi
+
+
+def data_dir():
+    home_dir = os.environ['HOME']
+    sysstr = platform.system()
+    if sysstr == 'Darwin':
+        path = os.path.join(home_dir, "Library", "Bytom")
+    elif sysstr == 'Windows':
+        path = os.path.join(home_dir, "AppData", "Roaming", "Bytom")
+    else:
+        path = os.path.join(home_dir, ".bytom")
+    return path
+
+
 
 
 _sigma = ['e', 'x', 'p', 'a', 'n', 'd', ' ', '3', '2', '-', 'b', 'y', 't', 'e', ' ', 'k']

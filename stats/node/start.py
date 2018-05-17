@@ -2,6 +2,7 @@
 
 
 from config import Config
+
 import ed25519
 import curve25519
 import logging
@@ -53,6 +54,7 @@ locEphPriv = curve25519.Private()
 locEphPub = locEphPriv.get_public()
 print locEphPriv.serialize().encode('hex'), locEphPub.serialize().encode('hex')
 print "curve25519: ", len(locEphPriv.serialize()), len(locEphPub.serialize())
+print
 
 # 3.从connect中读取对方的curve25519公钥, 计算共享密钥
 remEphPub = shareEphPubKey(s, locEphPub.serialize())
@@ -64,7 +66,7 @@ s = [hex_str_to_int(b) for b in share]
 print 'share: ', s
 share_key = hsalsa20(s, zeros_in, s, sigma)
 print 'share key: ', share_key
-
+print
 
 loc_pub = [hex_str_to_int(p) for p in locEphPub.serialize()]
 rem_pub = [hex_str_to_int(p) for p in remEphPub]
@@ -79,7 +81,8 @@ for lb in loEphPub:
     lo_pub_hex += int_to_hex_str(lb)
 for hb in hiEphPub:
     hi_pub_hex += int_to_hex_str(hb)
-print lo_pub_hex, hi_pub_hex
+print 'lo_pub_hex, hi_pub_hex: ', lo_pub_hex, hi_pub_hex
 challenge = sha256(lo_pub_hex+hi_pub_hex)
-print 'challenge', challenge.encode('hex')
+print 'challenge: ', challenge.encode('hex')
 
+print
