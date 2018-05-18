@@ -80,7 +80,27 @@ class NodeConn(Greenlet):
         self.state = "Closed"
 
 
+class NodeStats:
 
+    def __init__(self, hosts):
+        self.hosts = hosts
+        self.online_num = 0
+        self.online_node = []
+
+    def node_stats(self):
+        for h in self.hosts:
+            ip, port = h
+            node_conn = NodeConn(ip, port)
+            if node_conn.state == "Connected":
+                self.online_num +=1
+                self.online_node.append(h)
+                node_conn.handle_close()
+            else:
+                continue
+
+
+if __name__ == "__main__":
+    pass
 
 
 filename = '/Users/Nov/Library/bytom/addrbook.json'
