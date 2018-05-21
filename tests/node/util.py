@@ -35,7 +35,6 @@ def data_dir():
 
 
 
-
 _sigma = ['e', 'x', 'p', 'a', 'n', 'd', ' ', '3', '2', '-', 'b', 'y', 't', 'e', ' ', 'k']
 # sigma = b"expand 32-byte k".decode('ascii')
 sigma = []
