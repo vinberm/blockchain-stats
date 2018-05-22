@@ -12,7 +12,7 @@ import sys
 def run(url):
     base_url = "http://" + url
     asl = BasicInfo(base_url)
-    status = asl.all_chain_status()
+    status = asl.chain_status()
     if status is None:
         sys.exit()
     filename = os.path.join(os.getcwd(), 'result.json')

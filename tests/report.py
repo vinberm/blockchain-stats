@@ -58,7 +58,7 @@ class BasicInfo:
         if height - num <= 0 or height <= 0 or num <= 0:
             return None
         sum = 0
-        for h in range(height-num, height+1):
+        for h in range(height-num+1, height+1):
             params = json.dumps({'block_height': h})
             url = '/'.join([self.url_base, 'get-block'])
             response = requests.post(url, params).json()
@@ -109,6 +109,16 @@ class BasicInfo:
             total_fee += self.cal_tx_fee(tx)
         return 0 if total_size == 0 else total_fee / total_size
 
+    # N个块的交易平均手续费, num表示某一高度height往前的N个块
+    def get_average_txs_fee_n(self, height, num):
+        if height - num <= 0 or num <= 0:
+            return 0
+        total_fee = 0
+        for h in range(height-num, height + 1):
+            f = self.get_average_txs_fee(h)
+            total_fee += f
+        return total_fee / num
+
     def cal_tx_fee(self, tx):
         total_in = 0
         total_out = 0
@@ -116,7 +126,7 @@ class BasicInfo:
             btm_in = txin['amount'] if txin['asset_id'] == DEFAULT_ASSET_ID else 0
             total_in += btm_in
         for txout in tx['outputs']:
-            btm_out = txin['amount'] if txout['asset_id'] == DEFAULT_ASSET_ID else 0
+            btm_out = txout['amount'] if txout['asset_id'] == DEFAULT_ASSET_ID else 0
             total_out += btm_out
         return total_in - total_out
 
@@ -127,8 +137,8 @@ class BasicInfo:
             raise Exception('get block failed: %s', response['msg'])
         return response['data']['total']
 
-    # 24小时出块总数和所有块时间戳等
-    def new_block_status(self):
+    # 24小时内出块总数、平均时间、中位数、最大、最小; 交易总数、平均区块费用、平均交易费用、平均hash rate
+    def chain_status(self):
         ticks = int(time.time())
         recent_height = self.get_recent_height()
         recent_timestamp = self.get_block_by_height(recent_height)['timestamp']
@@ -155,26 +165,31 @@ class BasicInfo:
         length = len(intervals)
         median_interval = (intervals[length/2] + intervals[length/2-1]) / 2 if length % 2 == 0 else intervals[(length+1)/2]
         # 24小时内出块总数、平均时间、中位数、最大、最小
-        return [total_num, average_block_time, median_interval, intervals[-1], intervals[0]]
 
-    def all_chain_status(self):
-        h = self.get_recent_height()
-        block_status = self.new_block_status()
-        if len(block_status) == 0:
-            return None
+        tx_num_24 = self.get_tx_num(recent_height, total_num) * total_num - total_num
+        block_fee_24 = self.get_block_fee(recent_height, total_num)
+        hash_rate_24 = self.get_average_hash_rate(recent_height, total_num)
+        tx_fee_24 = self.get_average_txs_fee_n(recent_height, total_num)
+
         result = {
-            "height": h,
-            "last_block_interval": self.get_last_block_interval(h),
-            "difficulty": self.get_difficulty(h),
-            "hash_rate": self.get_average_hash_rate(h, 100),
-            "tx_num": self.get_tx_num(h, 100),
-            "block_fee": self.get_block_fee(h, 100),
-            "tx_fee": self.get_average_txs_fee(h),
-            "pool_tx_num": self.list_txpool_num(),
-            "block_num_one_day": block_status[0],
-            "average_block_interval": block_status[1],
-            "median_block_interval": block_status[2],
-            "max_block_interval": block_status[3],
-            "min_block_interval": block_status[4]
+            "height": recent_height,
+            "timestamp": recent_timestamp,
+            "block_num_24": total_num,
+            "tx_num_24": tx_num_24,
+            "block_fee_24": block_fee_24,
+            "tx_fee_24": tx_fee_24,
+            "hash_rate_24": hash_rate_24,
+            "average_block_interval": average_block_time,
+            "median_block_interval": median_interval,
+            "max_block_interval": intervals[-1],
+            "min_block_interval": intervals[0]
         }
         return result
+
+
+if __name__ == '__main__':
+    base_url = "http://127.0.0.1:9888"
+    bi = BasicInfo(base_url)
+    print bi.chain_status()
+    print bi.get_average_hash_rate(21349, 1)
+
