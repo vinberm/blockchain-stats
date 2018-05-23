@@ -26,11 +26,16 @@ class MongodbClient:
             raise Exception("Mongodb Authentication Fail")
 
     def get(self, table, cond=None):
+        if cond is None:
+            cond = {}
         res = self.mc[table].find_one(cond)
         return res if res else None
 
     def insert(self, table, value):
         self.mc[table].insert(value)
+
+    def insert_many(self, table, value_list):
+        self.mc[table].insert_many(value_list)
 
     def get_all(self, table, cond={}, items=None, n=0, sort_key=None, ascend=True, skip=0):
         collection = self.mc[table].find(cond, items) if items else self.mc[table].find(cond)
@@ -43,8 +48,9 @@ class MongodbClient:
             return collection
 
     def get_last_n(self, table, args, order, n):
-        res = self.mc[table].find(args).sort(order, -1).limit(n)
-        return res if res else None
+        res = self.mc[table].find(args).sort(order, -1).skip(n).limit(1)
+        rlist = list(res)
+        return rlist[0] if rlist else None
 
     def get_one(self, table, cond):
         res = self.mc[table].find_one(cond)
