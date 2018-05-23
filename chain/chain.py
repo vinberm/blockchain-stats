@@ -239,29 +239,26 @@ class ChainStats(object):
     # 历史每天的chain状态
     def chain_status_history(self):
         recent_height = self.proxy.get_recent_height()
-        current_time = int(time.time())
+        current_time = self.proxy.get_block_by_height(recent_height)['timestamp']
         print current_time
         genesis_time = self.proxy.get_block_by_height(0)['timestamp']
         days = (current_time - genesis_time) / 86400
         print 'days:', days
 
-        height_point = []
-        result = []
-        print "starting..."
-        for d in range(1, days+1):
-            for h in range(recent_height):
-                bl = self.proxy.get_block_by_height(h + 1)
-                if bl['timestamp'] < genesis_time + d * 86400:
-                    continue
-                height_point.append(h)
-                break
-        print '--height_point--: ', height_point
+        blocks = self.proxy.get_blocks_in_range(0, recent_height+1)
+        timestamps = [block['timestamp'] for block in blocks]
+        print 'timestamps', timestamps
 
-        # for i in range(len(height_point)-1):
-        #     print 'height_point: ', height_point[i]
+        height_point = []
+        point = genesis_time
+        for i in range(len(timestamps)):
+            if timestamps[i] - point < 86400:
+                continue
+            height_point.append(i)
+            point = timestamps[i]
+
+        result = []
         jobs = [gevent.spawn(self._compute, result, height_point[i], height_point[i+1]) for i in range(len(height_point)-1)]
-                # status = self.chain_status_between(height_point[i], height_point[i + 1])
-                # result.append(status)
         gevent.joinall(jobs)
         return result
 
