@@ -43,9 +43,10 @@ plt.gcf().autofmt_xdate()
 plt.show()
 
 
-def change_percent(diff):
-    for i in range(len(diff) - 1):
-        x = (diff[i + 1] - diff[i]) / float(diff[i]) * 100
+def change_percent(list):
+    y = []
+    for i in range(len(list) - 1):
+        x = (list[i + 1] - list[i]) / float(list[i]) * 100
 
         y.append(str(float('%.2f' % x)) + '%')
     print y
