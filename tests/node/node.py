@@ -126,5 +126,5 @@ if __name__ == "__main__":
     status = get_node_stats()
     print 'node num: ', status['current_node_num']
     print 'nodes: ', status['online_nodes']
-    timer = threading.Timer(20, loop_stats)
-    timer.start()
+    # timer = threading.Timer(20, loop_stats)
+    # timer.start()

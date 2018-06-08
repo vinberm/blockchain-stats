@@ -4,6 +4,30 @@ import hashlib
 import platform
 import os
 from numpy import uint32, uint8
+from binascii import hexlify, unhexlify
+
+
+def bytes_to_hex_str(bytes):
+    return hexlify(bytes)
+
+
+def bytes_to_array(bytes):
+    res = []
+    for x in bytes:
+        y = int(x.encode('hex'), 16)
+        res.append(y)
+    return res
+
+
+def array_to_bytes(array):
+    res = ''
+    for x in array:
+        y = hex(x)[2:]
+        if len(y) == 2:
+            res += y
+        else:
+            res += y + '0'
+    return unhexlify(res)
 
 
 def hex_str_to_int(s):

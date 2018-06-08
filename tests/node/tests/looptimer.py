@@ -7,7 +7,7 @@ import time
 def fun_timer():
     print 'Hello S!'
     global timer
-    timer = threading.Timer(2, fun_timer)
+    timer = threading.Timer(1, fun_timer)
     timer.start()
 
 

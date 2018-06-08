@@ -1,0 +1,1 @@
+supervisord --configuration=./supervisord.conf
